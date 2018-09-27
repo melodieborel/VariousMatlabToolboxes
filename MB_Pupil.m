@@ -1,16 +1,36 @@
 function data=MB_Pupil(sPathNames,data,handles)
 
+ if ~exist('sPathNames','var')
+     % first parameter does not exist, so default it to something
+     [fileName,path] = uigetfile('*','Chose the pupil video to analyse','MultiSelect','off');
+     sPathNames.path=path;
+     sPathNames.fileName=fileName;
+ end
+  if ~exist('data','var')
+     % second parameter does not exist, so default it to something
+      data = [];
+  end
+  if ~exist('handles','var')
+     % third parameter does not exist, so default it to something
+     handles=struct;
+      h=figure();
+      handles.axes_pupil=h
+  end
+  
+try  
 videolist=ls([sPathNames.rawPathePhys '\CameraPupil\' sPathNames.fileNameePhys(1:end-4)]);
 videolist=videolist(3:end,:);
 videoliststr=cellstr(videolist);
+catch
+end
 
 pupil=struct;
 
 %% select video
 j=1;
-for l=1:numel(videoliststr)
+for l=1:1%numel(videoliststr)
     %strFile=[sPathNames.rawPathePhys 'CameraPupil\' sPathNames.fileNameePhys(1:end-4) '\' videolist(l,:)];
-    strFile=[sPathNames.rawPathePhys '\' sPathNames.fileNameePhys];
+    strFile=[sPathNames.path '\' sPathNames.fileName];
     v=VideoReader(strFile);%[path listing(3,1).name]);
     numimages(l)=v.NumberOfFrames;
     
@@ -26,11 +46,12 @@ for l=1:numel(videoliststr)
         end
         gcf
     
-        hm=msgbox('Please select the pupil roi');
+        hm=msgbox('Please select the pupil roi and double click on the area');
+        disp('double click on the area to validate the roi');
         h = imrect(handles.axes_pupil);
         position = wait(h);
         delete(hm);
-        position = round(position);
+        position = round(position)
         xmin = position(1);
         ymin = position(2);
         width = position(3);
